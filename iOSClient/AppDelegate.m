@@ -503,6 +503,11 @@
     completionHandler();
 }
 
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+    NSLog(@"Push notification: %@", userInfo);
+}
+
 #pragma FIREBASE
 
 - (void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken
