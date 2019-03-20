@@ -506,6 +506,19 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
     NSLog(@"Push notification: %@", userInfo);
+    NSString *message = [userInfo objectForKey:@"subject"];
+    if (message && [CCUtility getPushNotificationPrivateKey]) {
+        NSString *decryptedMessage = [[NCPushNotificationEncryption sharedInstance] decryptPushNotification:message withDevicePrivateKey: [CCUtility getPushNotificationPrivateKey]];
+        if (decryptedMessage) {
+            UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+            content.body = decryptedMessage;
+            content.sound = [UNNotificationSound defaultSound];
+            NSString *identifier = [NSString stringWithFormat:@"Notification-%@", [NSDate new]];
+            UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:0.1 repeats:NO];
+            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:trigger];
+            [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
+        }
+    }
 }
 
 #pragma FIREBASE
